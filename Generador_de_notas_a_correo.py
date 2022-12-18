@@ -647,7 +647,7 @@ def get_text():
             message = EnsambleMensaje
 
             # setup the parameters of the message
-            password = "qwerTyui1"
+            password = "CronicaReg2022"
             msg['From'] = "notas.automaticas@gmail.com"
             msg['To'] = "notas.automaticas@gmail.com"
             msg['Subject'] = Titulo
