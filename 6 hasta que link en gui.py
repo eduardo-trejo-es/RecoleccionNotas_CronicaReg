@@ -143,7 +143,7 @@ def get_text():
         subclassFoto="media"
             #sub sub class tag se queda div
         subsubclassFoto="modal-body"
-    elif sitioWeb=="fiscaliageneralqro": 
+    elif sitioWeb=="fiscaliageneralqro":
         url='https://fiscaliageneralqro.gob.mx/CSnoticias/'
         #pagina_principal
         etiqueta_pag_prin="h3"
