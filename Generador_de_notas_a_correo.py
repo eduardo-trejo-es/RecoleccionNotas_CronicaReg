@@ -127,7 +127,7 @@ def get_text():
 
 
 
-    #Permite ignorar las certificaciones, esto lo hace inceguro, pero no es relevante ya que tomamos notas de un dominio publico
+    #Permite ignorar las certificaciones, esto lo hace inseguro, pero no es relevante ya que tomamos notas de un dominio publico
     if (not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None)):
         ssl._create_default_https_context = ssl._create_unverified_context
     
