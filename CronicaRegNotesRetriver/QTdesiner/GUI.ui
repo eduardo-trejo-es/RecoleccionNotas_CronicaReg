@@ -33,7 +33,7 @@
      <enum>QTabWidget::Triangular</enum>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <property name="iconSize">
      <size>
@@ -122,6 +122,9 @@
         <height>21</height>
        </rect>
       </property>
+      <property name="text">
+       <string/>
+      </property>
      </widget>
      <widget class="QLineEdit" name="APIConf_LEdit_AddTo">
       <property name="geometry">
@@ -168,7 +171,7 @@
        <enum>Qt::AutoText</enum>
       </property>
       <property name="pixmap">
-       <pixmap resource="ResourcesQTGUI.qrc">:/GoogleImages/Captura de Pantalla 2022-12-22 a la(s) 18.24.45.png</pixmap>
+       <pixmap>:/GoogleImages/Captura de Pantalla 2022-12-22 a la(s) 18.24.45.png</pixmap>
       </property>
       <property name="scaledContents">
        <bool>true</bool>
