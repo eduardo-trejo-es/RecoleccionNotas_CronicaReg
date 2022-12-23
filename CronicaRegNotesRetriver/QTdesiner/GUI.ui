@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
+ <class>CronicaRegNotesRetriver</class>
+ <widget class="QMainWindow" name="CronicaRegNotesRetriver">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>CronicaRegNotesRetriver</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
@@ -49,7 +49,7 @@
     </property>
     <widget class="QWidget" name="TabMailConf">
      <attribute name="title">
-      <string>Mail config</string>
+      <string>API/Gmail config</string>
      </attribute>
      <widget class="QLabel" name="label">
       <property name="geometry">
@@ -90,7 +90,7 @@
        <string>Address mail to</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton">
+     <widget class="QPushButton" name="APIConf_PB_Apply">
       <property name="geometry">
        <rect>
         <x>450</x>
@@ -103,7 +103,7 @@
        <string>Apply changes</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit">
+     <widget class="QLineEdit" name="APIConf_LEdit_CredPath">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -113,7 +113,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_2">
+     <widget class="QLineEdit" name="APIConf_LEdit_AddFrom">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -123,7 +123,7 @@
        </rect>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_3">
+     <widget class="QLineEdit" name="APIConf_LEdit_AddTo">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -133,12 +133,72 @@
        </rect>
       </property>
      </widget>
+     <widget class="QPushButton" name="APIConf_PB_Log">
+      <property name="geometry">
+       <rect>
+        <x>360</x>
+        <y>50</y>
+        <width>231</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="text">
+       <string>Log-In With google</string>
+      </property>
+      <property name="autoRepeatDelay">
+       <number>300</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>368</x>
+        <y>54</y>
+        <width>40</width>
+        <height>38</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="textFormat">
+       <enum>Qt::AutoText</enum>
+      </property>
+      <property name="pixmap">
+       <pixmap resource="ResourcesQTGUI.qrc">:/GoogleImages/Captura de Pantalla 2022-12-22 a la(s) 18.24.45.png</pixmap>
+      </property>
+      <property name="scaledContents">
+       <bool>true</bool>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="APIConf_LB_State">
+      <property name="geometry">
+       <rect>
+        <x>449</x>
+        <y>100</y>
+        <width>131</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Need to Log-In</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="TabSendNotes">
      <attribute name="title">
       <string>Sending notes</string>
      </attribute>
-     <widget class="QPushButton" name="pushButton_2">
+     <widget class="QPushButton" name="SenNo_PB_Verify">
       <property name="geometry">
        <rect>
         <x>240</x>
@@ -151,7 +211,7 @@
        <string>Verify</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_3">
+     <widget class="QPushButton" name="SenNo_PB_Send">
       <property name="geometry">
        <rect>
         <x>420</x>
@@ -164,7 +224,7 @@
        <string>Send</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_4">
+     <widget class="QPushButton" name="SenNo_PB_Clear">
       <property name="geometry">
        <rect>
         <x>70</x>
@@ -177,7 +237,7 @@
        <string>Clear</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_4">
+     <widget class="QLineEdit" name="SenNo_LEdit_Link">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -197,10 +257,10 @@
        </rect>
       </property>
       <property name="text">
-       <string>Note link to get</string>
+       <string>Link to get its note</string>
       </property>
      </widget>
-     <widget class="QProgressBar" name="progressBar">
+     <widget class="QProgressBar" name="SenNo_progressBar">
       <property name="geometry">
        <rect>
         <x>110</x>
@@ -213,7 +273,7 @@
        <number>24</number>
       </property>
      </widget>
-     <widget class="QLabel" name="label_5">
+     <widget class="QLabel" name="SenNo_LB_State">
       <property name="geometry">
        <rect>
         <x>110</x>
@@ -226,7 +286,7 @@
        <string>Ready to get notes</string>
       </property>
      </widget>
-     <widget class="QTextEdit" name="textEdit_2">
+     <widget class="QTextEdit" name="SenNo_TEdit_VerTitle">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -246,15 +306,15 @@
        </rect>
       </property>
       <property name="text">
-       <string>Note title to be send</string>
+       <string>Verify note title to be send</string>
       </property>
      </widget>
     </widget>
-    <widget class="QWidget" name="tab">
+    <widget class="QWidget" name="TabAppComments">
      <attribute name="title">
-      <string>Comments</string>
+      <string>App comments</string>
      </attribute>
-     <widget class="QTextEdit" name="textEdit">
+     <widget class="QTextEdit" name="AppCom_TEdit_body">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -263,8 +323,15 @@
         <height>201</height>
        </rect>
       </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'.AppleSystemUIFont'; font-size:13pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; color:#a6a6a6;&quot;&gt;Send a comment to developper&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
      </widget>
-     <widget class="QLineEdit" name="lineEdit_5">
+     <widget class="QLineEdit" name="AppCom_LEdit_Title">
       <property name="geometry">
        <rect>
         <x>20</x>
@@ -277,7 +344,7 @@
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_5">
+     <widget class="QPushButton" name="AppCom_PB_Submit">
       <property name="geometry">
        <rect>
         <x>450</x>
@@ -287,7 +354,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Submite</string>
+       <string>Submit</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_6">
@@ -300,10 +367,10 @@
        </rect>
       </property>
       <property name="text">
-       <string>Improvement title</string>
+       <string>Improvement name</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_6">
+     <widget class="QPushButton" name="AppCom_PB_Clear">
       <property name="geometry">
        <rect>
         <x>330</x>
@@ -316,11 +383,26 @@
        <string>Clear</string>
       </property>
      </widget>
+     <widget class="QLabel" name="SenNo_LB_State_2">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>290</y>
+        <width>271</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Ready to send comment</string>
+      </property>
+     </widget>
     </widget>
    </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
- <resources/>
+ <resources>
+  <include location="ResourcesQTGUI.qrc"/>
+ </resources>
  <connections/>
 </ui>
