@@ -13,6 +13,8 @@ GmailMailling = Mailing("notas.automaticas@gmail.com")
 Service = GoogleClientAPI.gmail_authenticate("CronicaRegNotesRetriver/GoogleAPI_Credentials/credentials.json")
 
 
+
+
 imeges_attached=["/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/Images/Titular de SEDESU presenta avances en agenda ambiental0.jpg"]
 mail_to= "paginalalo9@gmail.com"
 mail_obj = "Titulo de nota"
