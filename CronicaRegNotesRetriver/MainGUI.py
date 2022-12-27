@@ -14,19 +14,30 @@ from Google_API_Credential import Loging_Google_API
 from GmailAPI import Mailing
 
 from Process import Process
+from Note_Retiver import Retiver
 
 class Ui_CronicaRegNotesRetriver(object):
     def __init__(self):
         ####  App Instances 
             ## Instances init
+        
         with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/appConfig.json", "r") as read_file:
             self.data = json.load(read_file)
         self.GoogleClientAPI = Loging_Google_API()
-        self.GmailMailling = Mailing(self.data["MailFrom"])
+        self.GmailMailling_Suggestions = Mailing(self.data["MailFrom"])
+        self.GmailMailling_Notes_sender = Mailing(self.data["MailFrom"])
+
         self.process = Process()
+        self.notes_retriver = Retiver()
+        
+        with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json", "r") as read_file:
+            self.verifyNotesDict = json.load(read_file)
+        
         
         ## global var init
         self.BarProgresVar=0
+        self.resulta_suggestSent=0
+        self.RetrivingState=0
         
     
     def setupUi(self, CronicaRegNotesRetriver):
@@ -111,7 +122,7 @@ class Ui_CronicaRegNotesRetriver(object):
         self.SenNo_TEdit_VerTitle = QtWidgets.QTextEdit(self.TabSendNotes)
         self.SenNo_TEdit_VerTitle.setGeometry(QtCore.QRect(10, 90, 551, 71))
         self.SenNo_TEdit_VerTitle.setObjectName("SenNo_TEdit_VerTitle")
-        self.SenNo_TEdit_VerTitle.setDisabled(True)
+        self.SenNo_TEdit_VerTitle.setDisabled(False)
         self.label_7 = QtWidgets.QLabel(self.TabSendNotes)
         self.label_7.setGeometry(QtCore.QRect(10, 70, 191, 16))
         self.label_7.setObjectName("label_7")
@@ -149,8 +160,8 @@ class Ui_CronicaRegNotesRetriver(object):
         
         #--------- thread emit signals -----------
         self.process.Update_Progress.connect(self.Event_UpdateProgress_SP)
-        
-        
+        self.GmailMailling_Suggestions.SendingResult_Progress.connect(self.Event_ResultaSendingSuggest)
+        self.notes_retriver.RetrivingResult_Progress.connect(self.Event_RetrivingNote)
         
         #####  Buttons calls #####
     
@@ -199,6 +210,10 @@ class Ui_CronicaRegNotesRetriver(object):
         self.SenNo_LB_State_2.setText(_translate("CronicaRegNotesRetriver", "Ready to send comment"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.TabAppComments), _translate("CronicaRegNotesRetriver", "App comments"))
         self.UpdateObjectsTabAPI()
+        if self.data["Veryfication"] == 1:
+            self.API_Log()
+        else:
+            pass
 
     #####  Buttons  def #####
     
@@ -212,19 +227,10 @@ class Ui_CronicaRegNotesRetriver(object):
             self.Service = self.GoogleClientAPI.gmail_authenticate("CronicaRegNotesRetriver/GoogleAPI_Credentials/credentials.json")
             #####    this process most be a threaded
             #condition missing when Service get the valid value
-            
-            self.APIConf_LB_State.setGeometry(QtCore.QRect(465, 100, 120, 20))
-            self.APIConf_LB_State.setStyleSheet("background-color: lightgreen")
-            self.APIConf_LB_State.setText("Succesfully verified")
-            self.update_AppConfigJson("Veryfication",1)
-            self.APIConf_PB_Log.setDisabled(True)
+            self.LB_State_faces(1)
         except:
-            self.APIConf_LB_State.setGeometry(QtCore.QRect(385, 100, 200, 20))
-            self.APIConf_LB_State.setStyleSheet("background-color: red")
-            self.APIConf_LB_State.setText("Can't verify,  not com with server")
-            self.update_AppConfigJson("Veryfication",0)
-            self.APIConf_PB_Log.setDisabled(False)
-        
+            self.LB_State_faces(0)
+    
     def ApplyConfig(self):
         #Update credentials path
         self.update_AppConfigJson("CredentialPath",str(self.APIConf_LEdit_CredPath.text()))
@@ -239,8 +245,30 @@ class Ui_CronicaRegNotesRetriver(object):
         
     def SenNo_Clear(self):
         self.SenNo_LEdit_Link.setText("")
+        
     def SenNo_Verify(self):
-        self.process.start()
+        self.notes_retriver.setUrlToRetrive(str(self.SenNo_LEdit_Link.text()))
+        self.notes_retriver.start()
+        
+        
+    def toVerifyTitleandBodyNote(self):
+        Title,body,url=self.notes_retriver.getTitleandBodyNote()
+        self.verifyNotesDict[Title]=url
+        
+        self.addItems_VerifyNotesJson(self.verifyNotesDict)
+               
+        self.ShowNotesAddToDict()
+    
+    def ShowNotesAddToDict(self):
+        with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json", "r") as read_file:
+            data = json.load(read_file)
+        
+        keys=""
+        for i in data.keys():
+            keys="*- "+keys+"\n"+"*- "+i
+        print(keys)
+        self.SenNo_TEdit_VerTitle.setPlainText(keys)
+    
     def SenNo_Send(self):
         pass
         
@@ -249,8 +277,15 @@ class Ui_CronicaRegNotesRetriver(object):
     def AppCom_Clear(self):
         self.AppCom_LEdit_Title.setText("")
         self.AppCom_TEdit_body.setText("")
+    
     def AppCom_Submit(self):
-        pass
+        imeges_attached=[]
+        Service=self.Service
+        mail_to= "paginalalo9@gmail.com"
+        mail_obj = "App suggestion "+ str(self.AppCom_LEdit_Title.text())
+        mail_body = str(self.AppCom_TEdit_body.toPlainText())
+        self.GmailMailling_Suggestions.SetValues(Service, mail_to, mail_obj, mail_body, imeges_attached)
+        self.GmailMailling_Suggestions.start()
     
         
     #### General functions
@@ -261,8 +296,27 @@ class Ui_CronicaRegNotesRetriver(object):
             data = json.load(read_file) 
         data[param]=new_value
             
-        with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/appConfig.json", "w") as write_file:
-            json.dump(data, write_file)
+        with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/appConfig.json", "w",encoding='utf-8') as write_file:
+            json.dump(data, write_file, ensure_ascii=False)
+    
+    def addItems_VerifyNotesJson(self,dict):
+        with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json", "w", encoding='utf-8') as write_file:
+            json.dump(dict, write_file,ensure_ascii=False)
+        
+    
+    def LB_State_faces(self, NumFace):
+        if NumFace == 1:
+            self.APIConf_LB_State.setGeometry(QtCore.QRect(465, 100, 120, 20))
+            self.APIConf_LB_State.setStyleSheet("background-color: lightgreen")
+            self.APIConf_LB_State.setText("Succesfully verified")
+            self.update_AppConfigJson("Veryfication",1)
+            self.APIConf_PB_Log.setDisabled(True)
+        elif NumFace == 0 :
+            self.APIConf_LB_State.setGeometry(QtCore.QRect(385, 100, 200, 20))
+            self.APIConf_LB_State.setStyleSheet("background-color: red")
+            self.APIConf_LB_State.setText("Can't verify,  not com with server")
+            self.update_AppConfigJson("Veryfication",0)
+            self.APIConf_PB_Log.setDisabled(False)
     
     ##### Updated objects GUI
     
@@ -293,6 +347,22 @@ class Ui_CronicaRegNotesRetriver(object):
         print(self.BarProgresVar)
         
         ### TabAppComments
+        
+    def Event_ResultaSendingSuggest(self, val):
+        self.resulta_suggestSent=val
+        if self.resulta_suggestSent == 0:
+            self.SenNo_LB_State_2.setText("Ready to send comment")
+        elif self.resulta_suggestSent == 1:
+            self.SenNo_LB_State_2.setText("Message succesfully sent")
+        elif self.resulta_suggestSent == 2:
+            self.SenNo_LB_State_2.setText("Error, message not sent")
+            
+    def Event_RetrivingNote(self, val):
+        #0 not done
+        #1 retriving done
+        self.RetrivingState=val
+        if self.RetrivingState == 1:
+            self.toVerifyTitleandBodyNote()
     
 
 if __name__ == "__main__":

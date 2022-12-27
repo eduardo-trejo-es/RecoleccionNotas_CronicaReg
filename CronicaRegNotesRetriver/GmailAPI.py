@@ -4,6 +4,7 @@ import pickle
 # Gmail API utils
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
+from PyQt5.QtCore import *
 from google.auth.transport.requests import Request
 # for encoding/decoding messages in base64
 from base64 import urlsafe_b64decode, urlsafe_b64encode
@@ -15,10 +16,22 @@ from email.mime.audio import MIMEAudio
 from email.mime.base import MIMEBase
 from mimetypes import guess_type as guess_mime_type
 
+import time
 
-class Mailing():
+
+class Mailing(QThread):
+    SendingResult_Progress = pyqtSignal(int)
+    
     def __init__(self,OURMAIL):
+        super().__init__()
         self.our_email=OURMAIL
+        
+    def SetValues(self,Service, Destination, Obj, Body, Attachments):
+        self.service = Service
+        self.destination = Destination
+        self.obj = Obj
+        self.body = Body
+        self.attachments = Attachments
 
     # Adds the attachment with the given filename to the given message
     def add_attachment(self,message, filename):
@@ -66,3 +79,14 @@ class Mailing():
     
     def send_message(self,service, destination, obj, body, attachments=[]):
         return service.users().messages().send(userId="me",body=self.build_message(destination, obj, body, attachments)).execute()
+    
+    def run(self):
+        try:
+            self.send_message(self.service, self.destination, self.obj, self.body, self.attachments)
+            print("mail sent")
+            self.SendingResult_Progress.emit(1)
+        except:
+            print("problem mailing")
+            self.SendingResult_Progress.emit(2)
+        time.sleep(3)
+        self.SendingResult_Progress.emit(0)
