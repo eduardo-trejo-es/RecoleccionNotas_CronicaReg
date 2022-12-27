@@ -38,6 +38,8 @@ class Ui_CronicaRegNotesRetriver(object):
         self.BarProgresVar=0
         self.resulta_suggestSent=0
         self.RetrivingState=0
+        self.CountPressSenNo_PB_Clear=0
+        self.emptyDict={}
         
     
     def setupUi(self, CronicaRegNotesRetriver):
@@ -98,13 +100,13 @@ class Ui_CronicaRegNotesRetriver(object):
         self.TabSendNotes = QtWidgets.QWidget()
         self.TabSendNotes.setObjectName("TabSendNotes")
         self.SenNo_PB_Verify = QtWidgets.QPushButton(self.TabSendNotes)
-        self.SenNo_PB_Verify.setGeometry(QtCore.QRect(240, 170, 113, 32))
+        self.SenNo_PB_Verify.setGeometry(QtCore.QRect(240, 250, 113, 32))
         self.SenNo_PB_Verify.setObjectName("SenNo_PB_Verify")
         self.SenNo_PB_Send = QtWidgets.QPushButton(self.TabSendNotes)
-        self.SenNo_PB_Send.setGeometry(QtCore.QRect(420, 170, 113, 32))
+        self.SenNo_PB_Send.setGeometry(QtCore.QRect(420, 250, 113, 32))
         self.SenNo_PB_Send.setObjectName("SenNo_PB_Send")
         self.SenNo_PB_Clear = QtWidgets.QPushButton(self.TabSendNotes)
-        self.SenNo_PB_Clear.setGeometry(QtCore.QRect(70, 170, 113, 32))
+        self.SenNo_PB_Clear.setGeometry(QtCore.QRect(70, 250, 113, 32))
         self.SenNo_PB_Clear.setObjectName("SenNo_PB_Clear")
         self.SenNo_LEdit_Link = QtWidgets.QLineEdit(self.TabSendNotes)
         self.SenNo_LEdit_Link.setGeometry(QtCore.QRect(10, 40, 551, 21))
@@ -113,14 +115,14 @@ class Ui_CronicaRegNotesRetriver(object):
         self.label_4.setGeometry(QtCore.QRect(10, 20, 191, 16))
         self.label_4.setObjectName("label_4")
         self.SenNo_progressBar = QtWidgets.QProgressBar(self.TabSendNotes)
-        self.SenNo_progressBar.setGeometry(QtCore.QRect(110, 270, 341, 31))
+        self.SenNo_progressBar.setGeometry(QtCore.QRect(110, 300, 341, 31))
         self.SenNo_progressBar.setProperty("value", self.BarProgresVar)
         self.SenNo_progressBar.setObjectName("SenNo_progressBar")
         self.SenNo_LB_State = QtWidgets.QLabel(self.TabSendNotes)
-        self.SenNo_LB_State.setGeometry(QtCore.QRect(110, 260, 271, 16))
+        self.SenNo_LB_State.setGeometry(QtCore.QRect(110, 290, 271, 16))
         self.SenNo_LB_State.setObjectName("SenNo_LB_State")
         self.SenNo_TEdit_VerTitle = QtWidgets.QTextEdit(self.TabSendNotes)
-        self.SenNo_TEdit_VerTitle.setGeometry(QtCore.QRect(10, 90, 551, 71))
+        self.SenNo_TEdit_VerTitle.setGeometry(QtCore.QRect(10, 90, 551, 155))
         self.SenNo_TEdit_VerTitle.setObjectName("SenNo_TEdit_VerTitle")
         self.SenNo_TEdit_VerTitle.setDisabled(False)
         self.label_7 = QtWidgets.QLabel(self.TabSendNotes)
@@ -238,15 +240,21 @@ class Ui_CronicaRegNotesRetriver(object):
         self.update_AppConfigJson("MailFrom",str(self.APIConf_LEdit_AddFrom.text()))
         #Update Mail to
         self.update_AppConfigJson("MailTo",str(self.APIConf_LEdit_AddTo.text()))
-        
         self.UpdateObjectsTabAPI()
-        
         ### TabSendNotes
         
     def SenNo_Clear(self):
         self.SenNo_LEdit_Link.setText("")
+        self.CountPressSenNo_PB_Clear=self.CountPressSenNo_PB_Clear+1
+        print(self.CountPressSenNo_PB_Clear)
+        if self.CountPressSenNo_PB_Clear>=3 :
+            self.ModifItems_VerifyNotesJson(self.emptyDict)
+            self.ShowNotesAddToDict()
+            self.CountPressSenNo_PB_Clear=0
+            
         
     def SenNo_Verify(self):
+        self.CountPressSenNo_PB_Clear=0
         self.notes_retriver.setUrlToRetrive(str(self.SenNo_LEdit_Link.text()))
         self.notes_retriver.start()
         
@@ -254,23 +262,27 @@ class Ui_CronicaRegNotesRetriver(object):
     def toVerifyTitleandBodyNote(self):
         Title,body,url=self.notes_retriver.getTitleandBodyNote()
         self.verifyNotesDict[Title]=url
-        
-        self.addItems_VerifyNotesJson(self.verifyNotesDict)
-               
+        self.ModifItems_VerifyNotesJson(self.verifyNotesDict)    
         self.ShowNotesAddToDict()
     
     def ShowNotesAddToDict(self):
         with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json", "r") as read_file:
             data = json.load(read_file)
-        
         keys=""
+        onlyfirst=True
         for i in data.keys():
-            keys="*- "+keys+"\n"+"*- "+i
-        print(keys)
+            if onlyfirst:
+                keys="*- "+i+"\n"
+                onlyfirst=False
+            else:
+                keys=keys+"*- "+i+"\n"
         self.SenNo_TEdit_VerTitle.setPlainText(keys)
     
     def SenNo_Send(self):
-        pass
+        with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json", "r") as read_file:
+            data = json.load(read_file)
+        self.notes_retriver.TitleAndbodyNoteSend(data,True)
+        self.notes_retriver.start()
         
         ### TabAppComments
     
@@ -281,7 +293,7 @@ class Ui_CronicaRegNotesRetriver(object):
     def AppCom_Submit(self):
         imeges_attached=[]
         Service=self.Service
-        mail_to= "paginalalo9@gmail.com"
+        mail_to= "notas.automaticas@gmail.com"
         mail_obj = "App suggestion "+ str(self.AppCom_LEdit_Title.text())
         mail_body = str(self.AppCom_TEdit_body.toPlainText())
         self.GmailMailling_Suggestions.SetValues(Service, mail_to, mail_obj, mail_body, imeges_attached)
@@ -299,9 +311,10 @@ class Ui_CronicaRegNotesRetriver(object):
         with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/appConfig.json", "w",encoding='utf-8') as write_file:
             json.dump(data, write_file, ensure_ascii=False)
     
-    def addItems_VerifyNotesJson(self,dict):
+    def ModifItems_VerifyNotesJson(self,dict):
         with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json", "w", encoding='utf-8') as write_file:
             json.dump(dict, write_file,ensure_ascii=False)
+
         
     
     def LB_State_faces(self, NumFace):

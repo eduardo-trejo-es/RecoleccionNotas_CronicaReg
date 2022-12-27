@@ -14,11 +14,15 @@ class Retiver(QThread):
         super().__init__()
         self.STR_Title=""
         self.EnsambleMensaje=""
+        self.toSend=False
+        self.NotesDict={}
 
     def setUrlToRetrive(self,Url):
         self.url=Url
+        
     
     def to_retrive(self):
+        
         if (not os.environ.get('PYTHONHTTPSVERIFY', '') and getattr(ssl, '_create_unverified_context', None)):
             ssl._create_default_https_context = ssl._create_unverified_context
         
@@ -53,12 +57,27 @@ class Retiver(QThread):
             self.EnsambleMensaje=self.EnsambleMensaje+j
             
         self.RetrivingResult_Progress.emit(1)
+        #print(self.STR_Title)
+        
+        #########################################
+        #     once get title and body need to be sent
+        #      got to go outside to be sent
         time.sleep(2)
         #self.RetrivingResult_Progress.emit(0)
     
     def getTitleandBodyNote(self):
         return self.STR_Title,self.EnsambleMensaje,self.url
     
+    def TitleAndbodyNoteSend(self,dict,tosend):
+        self.toSend=tosend
+        self.NotesDict=dict
+        
     def run(self):
         self.RetrivingResult_Progress.emit(0)
-        self.to_retrive()
+        if self.toSend:
+            for i in self.NotesDict.keys():
+                self.setUrlToRetrive(self.NotesDict[i])
+                self.to_retrive()
+            self.toSend=False
+        else:
+            self.to_retrive()
