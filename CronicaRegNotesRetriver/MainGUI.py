@@ -252,7 +252,9 @@ class Ui_CronicaRegNotesRetriver(object):
         self.CountPressSenNo_PB_Clear=self.CountPressSenNo_PB_Clear+1
         print(self.CountPressSenNo_PB_Clear)
         if self.CountPressSenNo_PB_Clear>=3 :
+            self.emptyDict={}
             self.ModifItems_VerifyNotesJson(self.emptyDict)
+            self.verifyNotesDict=self.emptyDict
             self.ShowNotesAddToDict()
             self.CountPressSenNo_PB_Clear=0
             
@@ -328,7 +330,8 @@ class Ui_CronicaRegNotesRetriver(object):
     
     def ModifItems_VerifyNotesJson(self,dict):
         with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json", "w", encoding='utf-8') as write_file:
-            json.dump(dict, write_file,ensure_ascii=False)
+            print(dict)
+            json.dump(dict, write_file, ensure_ascii=False)
     
     def LB_State_faces(self, NumFace):
         if NumFace == 1:

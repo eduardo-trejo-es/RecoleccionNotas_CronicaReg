@@ -85,6 +85,7 @@ class Retiver(QThread):
     def run(self):
         self.RetrivingResult_Progress.emit(0)
         if self.toSend:
+            print("been calling toSend")
             for i in self.NotesDict.keys():
                 self.setUrlToRetrive(self.NotesDict[i])
                 self.to_retrive()
