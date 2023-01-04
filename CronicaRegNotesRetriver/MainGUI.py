@@ -164,6 +164,7 @@ class Ui_CronicaRegNotesRetriver(object):
         self.process.Update_Progress.connect(self.Event_UpdateProgress_SP)
         self.GmailMailling_Suggestions.SendingResult_Progress.connect(self.Event_ResultaSendingSuggest)
         self.notes_retriver.RetrivingResult_Progress.connect(self.Event_RetrivingNote)
+        self.notes_retriver.ReadyToSend_Progress.connect(self.SentNoteMail)
         
         #####  Buttons calls #####
     
@@ -222,13 +223,16 @@ class Ui_CronicaRegNotesRetriver(object):
         ### Tab API Conf
         
     def API_Log(self):
+        print("pressed")
         ## Authenticate app and PC to be able to use Google API
         self.APIConf_LB_State.setText("trying to verify...")
+        self.Service = self.GoogleClientAPI.gmail_authenticate("CronicaRegNotesRetriver/GoogleAPI_Credentials/credentials.json")
         try:
             #####    this process most be a threaded
             self.Service = self.GoogleClientAPI.gmail_authenticate("CronicaRegNotesRetriver/GoogleAPI_Credentials/credentials.json")
             #####    this process most be a threaded
             #condition missing when Service get the valid value
+            print(self.Service)
             self.LB_State_faces(1)
         except:
             self.LB_State_faces(0)
@@ -283,6 +287,17 @@ class Ui_CronicaRegNotesRetriver(object):
             data = json.load(read_file)
         self.notes_retriver.TitleAndbodyNoteSend(data,True)
         self.notes_retriver.start()
+    
+    def SentNoteMail(self):
+        imeges_attached=[]
+        Service=self.Service
+        mail_to= str(self.APIConf_LEdit_AddTo.text())
+        mail_obj,mail_body,url = self.notes_retriver.getTitleandBodyNote()
+        self.GmailMailling_Notes_sender.SetValues(Service, mail_to, mail_obj, mail_body, imeges_attached)
+        self.GmailMailling_Notes_sender.start()
+        #Can I get a real mail sending confirmation this will be a pull request
+        self.notes_retriver.MailSentState(1)
+        
         
         ### TabAppComments
     
@@ -314,8 +329,6 @@ class Ui_CronicaRegNotesRetriver(object):
     def ModifItems_VerifyNotesJson(self,dict):
         with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json", "w", encoding='utf-8') as write_file:
             json.dump(dict, write_file,ensure_ascii=False)
-
-        
     
     def LB_State_faces(self, NumFace):
         if NumFace == 1:

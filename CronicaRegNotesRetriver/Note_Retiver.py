@@ -9,6 +9,7 @@ from PyQt5.QtCore import *
 
 class Retiver(QThread):
     RetrivingResult_Progress = pyqtSignal(int)
+    ReadyToSend_Progress = pyqtSignal(int)
     
     def __init__(self):
         super().__init__()
@@ -16,6 +17,8 @@ class Retiver(QThread):
         self.EnsambleMensaje=""
         self.toSend=False
         self.NotesDict={}
+        self.SentState=0
+        self.FrontMontant=0
 
     def setUrlToRetrive(self,Url):
         self.url=Url
@@ -71,6 +74,13 @@ class Retiver(QThread):
     def TitleAndbodyNoteSend(self,dict,tosend):
         self.toSend=tosend
         self.NotesDict=dict
+    
+    def ReadyToSend(self):
+        self.ReadyToSend_Progress.emit(1)
+        
+    
+    def MailSentState(self,state):
+        self.SentState=state
         
     def run(self):
         self.RetrivingResult_Progress.emit(0)
@@ -78,6 +88,14 @@ class Retiver(QThread):
             for i in self.NotesDict.keys():
                 self.setUrlToRetrive(self.NotesDict[i])
                 self.to_retrive()
+                self.FrontMontant=0
+                while self.SentState==0:
+                    if self.FrontMontant==0:
+                        self.ReadyToSend()
+                        self.FrontMontant=1
+                self.SentState=0
+                time.sleep(2)
+                
             self.toSend=False
         else:
             self.to_retrive()
