@@ -333,6 +333,7 @@ class Ui_CronicaRegNotesRetriver(object):
             print(dict)
             json.dump(dict, write_file, ensure_ascii=False)
     
+
     def LB_State_faces(self, NumFace):
         if NumFace == 1:
             self.APIConf_LB_State.setGeometry(QtCore.QRect(465, 100, 120, 20))
