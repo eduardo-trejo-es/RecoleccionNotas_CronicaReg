@@ -15,6 +15,10 @@ from GmailAPI import Mailing
 
 from Process import Process
 from Note_Retiver import Retiver
+#borrar capeta
+from os import remove
+
+
 
 class Ui_CronicaRegNotesRetriver(object):
     def __init__(self):
@@ -161,10 +165,11 @@ class Ui_CronicaRegNotesRetriver(object):
         QtCore.QMetaObject.connectSlotsByName(CronicaRegNotesRetriver)
         
         #--------- thread emit signals -----------
-        self.process.Update_Progress.connect(self.Event_UpdateProgress_SP)
+        self.notes_retriver.Update_Progress.connect(self.Event_UpdateProgress_SP)
         self.GmailMailling_Suggestions.SendingResult_Progress.connect(self.Event_ResultaSendingSuggest)
         self.notes_retriver.RetrivingResult_Progress.connect(self.Event_RetrivingNote)
         self.notes_retriver.ReadyToSend_Progress.connect(self.SentNoteMail)
+        self.notes_retriver.Update_Progress_String.connect(self.Event_UpdateProgress_string)
         
         #####  Buttons calls #####
     
@@ -223,7 +228,7 @@ class Ui_CronicaRegNotesRetriver(object):
         ### Tab API Conf
         
     def API_Log(self):
-        print("pressed")
+        #print("pressed")
         ## Authenticate app and PC to be able to use Google API
         self.APIConf_LB_State.setText("trying to verify...")
         self.Service = self.GoogleClientAPI.gmail_authenticate("CronicaRegNotesRetriver/GoogleAPI_Credentials/credentials.json")
@@ -232,7 +237,7 @@ class Ui_CronicaRegNotesRetriver(object):
             self.Service = self.GoogleClientAPI.gmail_authenticate("CronicaRegNotesRetriver/GoogleAPI_Credentials/credentials.json")
             #####    this process most be a threaded
             #condition missing when Service get the valid value
-            print(self.Service)
+            #print(self.Service)
             self.LB_State_faces(1)
         except:
             self.LB_State_faces(0)
@@ -250,10 +255,27 @@ class Ui_CronicaRegNotesRetriver(object):
     def SenNo_Clear(self):
         self.SenNo_LEdit_Link.setText("")
         self.CountPressSenNo_PB_Clear=self.CountPressSenNo_PB_Clear+1
-        print(self.CountPressSenNo_PB_Clear)
+        #print(self.CountPressSenNo_PB_Clear)
         if self.CountPressSenNo_PB_Clear>=3 :
             self.emptyDict={}
+            ## Borrar imagenes de carpeta
+            with open("CronicaRegNotesRetriver/json/Images.json", "r") as read_file:
+                data = json.load(read_file)
+                #print(data)
+                #print(len(data))
+            for i in data.keys():
+                #print(i)
+                for j in data[i]:
+                    #print(j)
+                    try:
+                        remove(j)
+                    except:
+                        print("was not possible to delete imaged automatically")
+                        
+                    
             self.ModifItems_VerifyNotesJson(self.emptyDict)
+            self.ModifItems_Imagesjson(self.emptyDict)
+            
             self.verifyNotesDict=self.emptyDict
             self.ShowNotesAddToDict()
             self.CountPressSenNo_PB_Clear=0
@@ -291,10 +313,14 @@ class Ui_CronicaRegNotesRetriver(object):
         self.notes_retriver.start()
     
     def SentNoteMail(self):
-        imeges_attached=[]
+        with open("CronicaRegNotesRetriver/json/Images.json", "r") as read_file:
+            data = json.load(read_file)
+        
         Service=self.Service
         mail_to= str(self.APIConf_LEdit_AddTo.text())
         mail_obj,mail_body,url = self.notes_retriver.getTitleandBodyNote()
+        imeges_attached=data[mail_obj]
+        #print("image attached "+ str(imeges_attached))
         self.GmailMailling_Notes_sender.SetValues(Service, mail_to, mail_obj, mail_body, imeges_attached)
         self.GmailMailling_Notes_sender.start()
         #Can I get a real mail sending confirmation this will be a pull request
@@ -315,7 +341,6 @@ class Ui_CronicaRegNotesRetriver(object):
         mail_body = str(self.AppCom_TEdit_body.toPlainText())
         self.GmailMailling_Suggestions.SetValues(Service, mail_to, mail_obj, mail_body, imeges_attached)
         self.GmailMailling_Suggestions.start()
-    
         
     #### General functions
     
@@ -330,7 +355,12 @@ class Ui_CronicaRegNotesRetriver(object):
     
     def ModifItems_VerifyNotesJson(self,dict):
         with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json", "w", encoding='utf-8') as write_file:
-            print(dict)
+            #print(dict)
+            json.dump(dict, write_file, ensure_ascii=False)
+    
+    def ModifItems_Imagesjson(self,dict):
+        with open("CronicaRegNotesRetriver/json/Images.json", "w", encoding='utf-8') as write_file:
+            #print(dict)
             json.dump(dict, write_file, ensure_ascii=False)
     
 
@@ -362,7 +392,7 @@ class Ui_CronicaRegNotesRetriver(object):
         ### TabSendNotes
     def UpdateObjectsTabSendNotes(self):
         self.SenNo_progressBar.setProperty("value",self.BarProgresVar)
-        print('called')
+        #print('called')
         
         ### TabAppComments
         
@@ -372,9 +402,15 @@ class Ui_CronicaRegNotesRetriver(object):
         
         ### TabSendNotes
     def Event_UpdateProgress_SP(self, val):
-        self.BarProgresVar =val
-        self.UpdateObjectsTabSendNotes()
-        print(self.BarProgresVar)
+        if val<=100:
+            self.BarProgresVar =val
+        else:
+            self.BarProgresVar =100
+        
+        self.UpdateObjectsTabSendNotes()    
+    
+    def Event_UpdateProgress_string(self,val):
+        self.SenNo_LB_State.setText(val)
         
         ### TabAppComments
         
@@ -386,7 +422,7 @@ class Ui_CronicaRegNotesRetriver(object):
             self.SenNo_LB_State_2.setText("Message succesfully sent")
         elif self.resulta_suggestSent == 2:
             self.SenNo_LB_State_2.setText("Error, message not sent")
-            
+           
     def Event_RetrivingNote(self, val):
         #0 not done
         #1 retriving done
