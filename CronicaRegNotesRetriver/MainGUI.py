@@ -12,8 +12,6 @@ import json
 ### own created classes
 from Google_API_Credential import Loging_Google_API
 from GmailAPI import Mailing
-
-from Process import Process
 from Note_Retiver import Retiver
 #borrar capeta
 from os import remove
@@ -22,8 +20,14 @@ class Ui_CronicaRegNotesRetriver(object):
     def __init__(self):
         ####  App Instances 
             ## Instances 
-        self.AppconfigJsonPath="/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/appConfig.json"
-        self.VerifynotesJsonPath="/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json"
+        self.credentials_jsonPath="CronicaRegNotesRetriver/GoogleAPI_Credentials/credentials.json"
+        self.AppconfigJsonPath="CronicaRegNotesRetriver/json/appConfig.json"
+        self.VerifynotesJsonPath="CronicaRegNotesRetriver/json/VerifyNotes.json"
+        self.GoogleLogo_Path="CronicaRegNotesRetriver/QTdesiner/GoogleBTNLOGO.png"
+        self.Images_json_Path="CronicaRegNotesRetriver/json/Images.json"
+        
+        
+        
         
         with open(self.AppconfigJsonPath, "r") as read_file:
             self.data = json.load(read_file)
@@ -31,7 +35,6 @@ class Ui_CronicaRegNotesRetriver(object):
         self.GmailMailling_Suggestions = Mailing(self.data["MailFrom"])
         self.GmailMailling_Notes_sender = Mailing(self.data["MailFrom"])
 
-        self.process = Process()
         self.notes_retriver = Retiver()
         
         with open(self.VerifynotesJsonPath, "r") as read_file:
@@ -92,7 +95,7 @@ class Ui_CronicaRegNotesRetriver(object):
         self.label_5.setGeometry(QtCore.QRect(368, 56, 40, 38))
         self.label_5.setText("")
         self.label_5.setTextFormat(QtCore.Qt.AutoText)
-        self.label_5.setPixmap(QtGui.QPixmap("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/QTdesiner/GoogleBTNLOGO.png"))
+        self.label_5.setPixmap(QtGui.QPixmap(self.GoogleLogo_Path))
         self.label_5.setScaledContents(True)
         self.label_5.setWordWrap(True)
         self.label_5.setObjectName("label_5")
@@ -230,16 +233,14 @@ class Ui_CronicaRegNotesRetriver(object):
         ### Tab API Conf
         
     def API_Log(self):
-        #print("pressed")
         ## Authenticate app and PC to be able to use Google API
         self.APIConf_LB_State.setText("trying to verify...")
-        self.Service = self.GoogleClientAPI.gmail_authenticate("CronicaRegNotesRetriver/GoogleAPI_Credentials/credentials.json")
+        self.Service = self.GoogleClientAPI.gmail_authenticate(self.credentials_jsonPath)
         try:
             #####    this process most be a threaded
-            self.Service = self.GoogleClientAPI.gmail_authenticate("CronicaRegNotesRetriver/GoogleAPI_Credentials/credentials.json")
+            self.Service = self.GoogleClientAPI.gmail_authenticate(self.credentials_jsonPath)
             #####    this process most be a threaded
             #condition missing when Service get the valid value
-            #print(self.Service)
             self.LB_State_faces(1)
         except:
             self.LB_State_faces(0)
@@ -257,18 +258,13 @@ class Ui_CronicaRegNotesRetriver(object):
     def SenNo_Clear(self):
         self.SenNo_LEdit_Link.setText("")
         self.CountPressSenNo_PB_Clear=self.CountPressSenNo_PB_Clear+1
-        #print(self.CountPressSenNo_PB_Clear)
         if self.CountPressSenNo_PB_Clear>=3 :
             self.emptyDict={}
             ## Borrar imagenes de carpeta
-            with open("CronicaRegNotesRetriver/json/Images.json", "r") as read_file:
+            with open(self.Images_json_Path, "r") as read_file:
                 data = json.load(read_file)
-                #print(data)
-                #print(len(data))
             for i in data.keys():
-                #print(i)
                 for j in data[i]:
-                    #print(j)
                     try:
                         remove(j)
                     except:
@@ -300,7 +296,7 @@ class Ui_CronicaRegNotesRetriver(object):
         self.ShowNotesAddToDict()
     
     def ShowNotesAddToDict(self):
-        with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json", "r") as read_file:
+        with open(self.VerifynotesJsonPath, "r") as read_file:
             data = json.load(read_file)
         keys=""
         onlyfirst=True
@@ -313,24 +309,21 @@ class Ui_CronicaRegNotesRetriver(object):
         self.SenNo_TEdit_VerTitle.setPlainText(keys)
     
     def SenNo_Send(self):
-        with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json", "r") as read_file:
+        with open(self.VerifynotesJsonPath, "r") as read_file:
             data = json.load(read_file)
         self.notes_retriver.TitleAndbodyNoteSend(data,True)
         self.notes_retriver.start()
     
     def SentNoteMail(self):
-        with open("CronicaRegNotesRetriver/json/Images.json", "r") as read_file:
+        with open(self.Images_json_Path, "r") as read_file:
             data = json.load(read_file)
         
         Service=self.Service
         mail_to= str(self.APIConf_LEdit_AddTo.text())
         mail_obj,mail_body,url = self.notes_retriver.getTitleandBodyNote()
         imeges_attached=data[mail_obj]
-        #print("image attached "+ str(imeges_attached))
         self.GmailMailling_Notes_sender.SetValues(Service, mail_to, mail_obj, mail_body, imeges_attached)
         self.GmailMailling_Notes_sender.start()
-        #Can I get a real mail sending confirmation this will be a pull request
-        #self.notes_retriver.MailSentState(1)
     
     def Event_ResultaSendingNotes(self,val):
         if val==1:
@@ -355,21 +348,19 @@ class Ui_CronicaRegNotesRetriver(object):
          
         ###### Update appConfig json file
     def update_AppConfigJson(self,param,new_value):
-        with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/appConfig.json", "r") as read_file:
+        with open(self.AppconfigJsonPath, "r") as read_file:
             data = json.load(read_file) 
         data[param]=new_value
             
-        with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/appConfig.json", "w",encoding='utf-8') as write_file:
+        with open(self.AppconfigJsonPath, "w",encoding='utf-8') as write_file:
             json.dump(data, write_file, ensure_ascii=False)
     
     def ModifItems_VerifyNotesJson(self,dict):
-        with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json", "w", encoding='utf-8') as write_file:
-            #print(dict)
+        with open(self.VerifynotesJsonPath, "w", encoding='utf-8') as write_file:
             json.dump(dict, write_file, ensure_ascii=False)
     
     def ModifItems_Imagesjson(self,dict):
-        with open("CronicaRegNotesRetriver/json/Images.json", "w", encoding='utf-8') as write_file:
-            #print(dict)
+        with open(self.Images_json_Path, "w", encoding='utf-8') as write_file:
             json.dump(dict, write_file, ensure_ascii=False)
     
 
@@ -391,7 +382,7 @@ class Ui_CronicaRegNotesRetriver(object):
     
         ### Tab API Conf  
     def UpdateObjectsTabAPI(self):
-        with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/appConfig.json", "r") as read_file:
+        with open(self.AppconfigJsonPath, "r") as read_file:
             data = json.load(read_file)
         self.APIConf_LEdit_CredPath.setText(data["CredentialPath"])
         self.APIConf_LEdit_AddFrom.setText(data["MailFrom"])
@@ -401,7 +392,6 @@ class Ui_CronicaRegNotesRetriver(object):
         ### TabSendNotes
     def UpdateObjectsTabSendNotes(self):
         self.SenNo_progressBar.setProperty("value",self.BarProgresVar)
-        #print('called')
         
         ### TabAppComments
         

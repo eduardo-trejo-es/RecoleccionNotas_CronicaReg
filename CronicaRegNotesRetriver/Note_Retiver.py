@@ -29,6 +29,7 @@ class Retiver(QThread):
         self.SentState=0
         self.FrontMontant=0
         self.ImagesFolderPath="CronicaRegNotesRetriver/Images/"
+        self.ImageJsonPath="CronicaRegNotesRetriver/json/Images.json"
         self.RetrivingAndDownloadingDone=False
         self.progess=0
         self.progess_Step=0
@@ -166,11 +167,11 @@ class Retiver(QThread):
         self.UpdateImagesJson(note_title,ImagesPath)
     
     def UpdateImagesJson(self,Note_title, ImagesPath):
-        with open("CronicaRegNotesRetriver/json/Images.json", "r") as read_file:
+        with open(self.ImageJsonPath, "r") as read_file:
             data = json.load(read_file)
         data[Note_title]=ImagesPath 
             
-        with open("CronicaRegNotesRetriver/json/Images.json", "w",encoding='utf-8') as write_file:
+        with open(self.ImageJsonPath, "w",encoding='utf-8') as write_file:
             json.dump(data, write_file, ensure_ascii=False)
     
 
