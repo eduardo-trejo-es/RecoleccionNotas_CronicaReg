@@ -18,8 +18,6 @@ from Note_Retiver import Retiver
 #borrar capeta
 from os import remove
 
-
-
 class Ui_CronicaRegNotesRetriver(object):
     def __init__(self):
         ####  App Instances 
@@ -167,9 +165,11 @@ class Ui_CronicaRegNotesRetriver(object):
         #--------- thread emit signals -----------
         self.notes_retriver.Update_Progress.connect(self.Event_UpdateProgress_SP)
         self.GmailMailling_Suggestions.SendingResult_Progress.connect(self.Event_ResultaSendingSuggest)
+        self.GmailMailling_Notes_sender.SendingResult_Progress.connect(self.Event_ResultaSendingNotes)
         self.notes_retriver.RetrivingResult_Progress.connect(self.Event_RetrivingNote)
         self.notes_retriver.ReadyToSend_Progress.connect(self.SentNoteMail)
         self.notes_retriver.Update_Progress_String.connect(self.Event_UpdateProgress_string)
+    
         
         #####  Buttons calls #####
     
@@ -283,9 +283,13 @@ class Ui_CronicaRegNotesRetriver(object):
         
     def SenNo_Verify(self):
         self.CountPressSenNo_PB_Clear=0
-        self.notes_retriver.setUrlToRetrive(str(self.SenNo_LEdit_Link.text()))
-        self.notes_retriver.start()
-        
+        if str(self.SenNo_LEdit_Link.text())!="":
+            self.notes_retriver.setUrlToRetrive(str(self.SenNo_LEdit_Link.text()))
+            self.notes_retriver.start()
+        else:
+            self.SenNo_LEdit_Link.setText("Need to paste a right link format")
+            self.ShowNotesAddToDict()
+        self.SenNo_LEdit_Link.setText("")
         
     def toVerifyTitleandBodyNote(self):
         Title,body,url=self.notes_retriver.getTitleandBodyNote()
@@ -324,8 +328,11 @@ class Ui_CronicaRegNotesRetriver(object):
         self.GmailMailling_Notes_sender.SetValues(Service, mail_to, mail_obj, mail_body, imeges_attached)
         self.GmailMailling_Notes_sender.start()
         #Can I get a real mail sending confirmation this will be a pull request
-        self.notes_retriver.MailSentState(1)
-        
+        #self.notes_retriver.MailSentState(1)
+    
+    def Event_ResultaSendingNotes(self,val):
+        if val==1:
+            self.notes_retriver.MailSentState(1) 
         
         ### TabAppComments
     
@@ -336,14 +343,14 @@ class Ui_CronicaRegNotesRetriver(object):
     def AppCom_Submit(self):
         imeges_attached=[]
         Service=self.Service
-        mail_to= "notas.automaticas@gmail.com"
-        mail_obj = "App suggestion "+ str(self.AppCom_LEdit_Title.text())
+        mail_to= "paginalalo9@gmail.com"
+        mail_obj = "App Cronica suggestion "+ str(self.AppCom_LEdit_Title.text())
         mail_body = str(self.AppCom_TEdit_body.toPlainText())
         self.GmailMailling_Suggestions.SetValues(Service, mail_to, mail_obj, mail_body, imeges_attached)
         self.GmailMailling_Suggestions.start()
         
     #### General functions
-    
+         
         ###### Update appConfig json file
     def update_AppConfigJson(self,param,new_value):
         with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/appConfig.json", "r") as read_file:
