@@ -21,9 +21,11 @@ from os import remove
 class Ui_CronicaRegNotesRetriver(object):
     def __init__(self):
         ####  App Instances 
-            ## Instances init
+            ## Instances 
+        self.AppconfigJsonPath="/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/appConfig.json"
+        self.VerifynotesJsonPath="/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json"
         
-        with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/appConfig.json", "r") as read_file:
+        with open(self.AppconfigJsonPath, "r") as read_file:
             self.data = json.load(read_file)
         self.GoogleClientAPI = Loging_Google_API()
         self.GmailMailling_Suggestions = Mailing(self.data["MailFrom"])
@@ -32,7 +34,7 @@ class Ui_CronicaRegNotesRetriver(object):
         self.process = Process()
         self.notes_retriver = Retiver()
         
-        with open("/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/json/VerifyNotes.json", "r") as read_file:
+        with open(self.VerifynotesJsonPath, "r") as read_file:
             self.verifyNotesDict = json.load(read_file)
         
         
