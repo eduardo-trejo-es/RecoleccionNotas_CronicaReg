@@ -309,18 +309,20 @@ class Ui_CronicaRegNotesRetriver(object):
         self.SenNo_TEdit_VerTitle.setPlainText(keys)
     
     def SenNo_Send(self):
-        with open(self.VerifynotesJsonPath, "r") as read_file:
+        with open(self.VerifynotesJsonPath, "r",encoding="latin1") as read_file:
             data = json.load(read_file)
         self.notes_retriver.TitleAndbodyNoteSend(data,True)
         self.notes_retriver.start()
+        
     
     def SentNoteMail(self):
-        with open(self.Images_json_Path, "r") as read_file:
+        with open(self.Images_json_Path, "r",encoding="utf-8") as read_file:
             data = json.load(read_file)
         
         Service=self.Service
         mail_to= str(self.APIConf_LEdit_AddTo.text())
         mail_obj,mail_body,url = self.notes_retriver.getTitleandBodyNote()
+        print(data[mail_obj])
         imeges_attached=data[mail_obj]
         self.GmailMailling_Notes_sender.SetValues(Service, mail_to, mail_obj, mail_body, imeges_attached)
         self.GmailMailling_Notes_sender.start()
@@ -352,15 +354,15 @@ class Ui_CronicaRegNotesRetriver(object):
             data = json.load(read_file) 
         data[param]=new_value
             
-        with open(self.AppconfigJsonPath, "w",encoding='utf-8') as write_file:
+        with open(self.AppconfigJsonPath, "w",encoding="utf-8") as write_file:
             json.dump(data, write_file, ensure_ascii=False)
     
     def ModifItems_VerifyNotesJson(self,dict):
-        with open(self.VerifynotesJsonPath, "w", encoding='utf-8') as write_file:
+        with open(self.VerifynotesJsonPath, "w", encoding="latin1") as write_file:
             json.dump(dict, write_file, ensure_ascii=False)
     
     def ModifItems_Imagesjson(self,dict):
-        with open(self.Images_json_Path, "w", encoding='utf-8') as write_file:
+        with open(self.Images_json_Path, "w", encoding="utf-8") as write_file:
             json.dump(dict, write_file, ensure_ascii=False)
     
 

@@ -61,6 +61,14 @@ class Retiver(QThread):
         stringsentence=""
         ## 
         self.STR_Title=str(title.get_text('h3'))
+        #Prevent blank space at the beginning of title note
+        if self.STR_Title[0]==" ":
+            self.STR_Title=self.STR_Title[1:]
+        else:
+            pass
+        
+        #print(self.STR_Title)
+        
         self.progess=self.progess+self.progess_Step
         self.Update_Progress.emit(self.progess)
         self.Update_Progress_String.emit("got note"+self.STR_Title)
@@ -74,7 +82,7 @@ class Retiver(QThread):
                     stringsentence.replace('\n',"",300)
                     stringsentence.replace('\n',"",300)
                     stringsentence.replace('\n',"",300)"""
-                    print(stringsentence)
+                    #print(stringsentence)
                     STR_Sentences.append(stringsentence)
         
         print("This is the STR_Sentences "+str(len(STR_Sentences)))
@@ -156,7 +164,7 @@ class Retiver(QThread):
             self.Update_Progress.emit(self.progess)
             self.Update_Progress_String.emit("Downloading images number "+ str(ImagesNumber))
             url_imagen = Images_links[i] # El link de la imagen
-            nombre_local_imagen = note_title+" "+str(i)+".jpg" # El nombre con el que queremos guardarla
+            nombre_local_imagen = note_title+"_"+str(i)+".jpg" # El nombre con el que queremos guardarla
             imagen = requests.get(url_imagen, verify=False).content
             with open(nombre_local_imagen, 'wb') as handler:
                 handler.write(imagen)
