@@ -2,3 +2,7 @@ pip install pyqt5
 pip install google-api-python-client
 pip install google-auth-oauthlib
 pip install bs4
+
+
+to solve probleme, maybe this cause others
+pip install google-api-python-client==1.8.0

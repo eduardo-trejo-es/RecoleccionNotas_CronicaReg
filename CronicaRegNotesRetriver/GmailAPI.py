@@ -20,6 +20,10 @@ from mimetypes import guess_type as guess_mime_type
 
 import time
 
+from PyInstaller.utils.hooks import copy_metadata
+
+data= copy_metadata('google-api-python-client')
+
 
 class Mailing(QThread):
     SendingResult_Progress = pyqtSignal(int)

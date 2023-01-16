@@ -15,6 +15,10 @@ from email.mime.audio import MIMEAudio
 from email.mime.base import MIMEBase
 from mimetypes import guess_type as guess_mime_type
 
+from PyInstaller.utils.hooks import copy_metadata
+
+data= copy_metadata('google-api-python-client')
+
 
 class Loging_Google_API():
     def __init__(self):
