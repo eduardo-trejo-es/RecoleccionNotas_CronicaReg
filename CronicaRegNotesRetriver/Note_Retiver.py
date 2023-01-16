@@ -12,6 +12,8 @@ import requests
 import shutil
 import json
 
+from unidecode import unidecode
+
 from PyQt5.QtCore import *
 
 class Retiver(QThread):
@@ -28,8 +30,8 @@ class Retiver(QThread):
         self.NotesDict={}
         self.SentState=0
         self.FrontMontant=0
-        self.ImagesFolderPath="CronicaRegNotesRetriver/Images/"
-        self.ImageJsonPath="CronicaRegNotesRetriver/json/Images.json"
+        self.ImagesFolderPath="Images/"
+        self.ImageJsonPath="json/Images.json"
         self.RetrivingAndDownloadingDone=False
         self.progess=0
         self.progess_Step=0
@@ -134,7 +136,10 @@ class Retiver(QThread):
         self.SentState=state
       
     def ImagesDownloader(self,Note_title, Links_imagenes):
+        print("images downloader")
         note_title=Note_title
+        note_title=unidecode(note_title)
+        note_title=note_title.replace(" ","_",30)
         links_imagenes=Links_imagenes
         
         linksLength_imagenes=len(links_imagenes)

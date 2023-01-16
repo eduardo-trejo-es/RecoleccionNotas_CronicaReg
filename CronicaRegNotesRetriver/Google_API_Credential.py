@@ -21,7 +21,7 @@ class Loging_Google_API():
         # Request all access (permission to read/send/receive emails, manage the inbox, and more)
         self.SCOPES = ['https://mail.google.com/']
         self.our_email = 'notas.automaticas@gmail.com'
-        self.Token_Pickle="CronicaRegNotesRetriver/GoogleAPI_Credentials/token.pickle"
+        self.Token_Pickle="GoogleAPI_Credentials/token.pickle"
 
     def gmail_authenticate(self,Credential_Path):
         creds = None

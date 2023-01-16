@@ -15,19 +15,24 @@ from GmailAPI import Mailing
 from Note_Retiver import Retiver
 #borrar capeta
 from os import remove
+import os
+from shutil import rmtree
+import os
+import errno
+
+from unidecode import unidecode
+
 
 class Ui_CronicaRegNotesRetriver(object):
     def __init__(self):
         ####  App Instances 
             ## Instances 
-        self.credentials_jsonPath="CronicaRegNotesRetriver/GoogleAPI_Credentials/credentials.json"
-        self.AppconfigJsonPath="CronicaRegNotesRetriver/json/appConfig.json"
-        self.VerifynotesJsonPath="CronicaRegNotesRetriver/json/VerifyNotes.json"
-        self.GoogleLogo_Path="CronicaRegNotesRetriver/QTdesiner/GoogleBTNLOGO.png"
-        self.Images_json_Path="CronicaRegNotesRetriver/json/Images.json"
-        
-        
-        
+        self.credentials_jsonPath="GoogleAPI_Credentials/credentials.json"
+        self.AppconfigJsonPath="json/appConfig.json"
+        self.VerifynotesJsonPath="json/VerifyNotes.json"
+        self.GoogleLogo_Path="QTdesiner/GoogleBTNLOGO.png"
+        self.Images_json_Path="json/Images.json"
+        self.Images_FolderPath="Images/"
         
         with open(self.AppconfigJsonPath, "r") as read_file:
             self.data = json.load(read_file)
@@ -122,7 +127,7 @@ class Ui_CronicaRegNotesRetriver(object):
         self.label_4.setGeometry(QtCore.QRect(10, 20, 191, 16))
         self.label_4.setObjectName("label_4")
         self.SenNo_progressBar = QtWidgets.QProgressBar(self.TabSendNotes)
-        self.SenNo_progressBar.setGeometry(QtCore.QRect(110, 300, 341, 31))
+        self.SenNo_progressBar.setGeometry(QtCore.QRect(110, 307, 341, 31))
         self.SenNo_progressBar.setProperty("value", self.BarProgresVar)
         self.SenNo_progressBar.setObjectName("SenNo_progressBar")
         self.SenNo_LB_State = QtWidgets.QLabel(self.TabSendNotes)
@@ -263,6 +268,14 @@ class Ui_CronicaRegNotesRetriver(object):
             ## Borrar imagenes de carpeta
             with open(self.Images_json_Path, "r") as read_file:
                 data = json.load(read_file)
+            
+            rmtree(self.Images_FolderPath)
+            if not os.path.exists(self.Images_FolderPath):
+                try:
+                    os.mkdir(self.Images_FolderPath)
+                except OSError as e:
+                    if e.errno != errno.EEXIST:
+                        raise
             for i in data.keys():
                 for j in data[i]:
                     try:
@@ -318,12 +331,14 @@ class Ui_CronicaRegNotesRetriver(object):
     def SentNoteMail(self):
         with open(self.Images_json_Path, "r",encoding="utf-8") as read_file:
             data = json.load(read_file)
+        print("Dataaa-.........."+str(data))
         
         Service=self.Service
         mail_to= str(self.APIConf_LEdit_AddTo.text())
         mail_obj,mail_body,url = self.notes_retriver.getTitleandBodyNote()
-        print(data[mail_obj])
-        imeges_attached=data[mail_obj]
+        mail_objTitle=unidecode(mail_obj)
+        mail_objTitle=mail_objTitle.replace(" ","_",30)
+        imeges_attached=data[mail_objTitle]
         self.GmailMailling_Notes_sender.SetValues(Service, mail_to, mail_obj, mail_body, imeges_attached)
         self.GmailMailling_Notes_sender.start()
     

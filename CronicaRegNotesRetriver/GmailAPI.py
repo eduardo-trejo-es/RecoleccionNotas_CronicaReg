@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 #librerias para enviar correo
 import os
 import pickle
@@ -44,7 +46,9 @@ class Mailing(QThread):
             msg = MIMEText(fp.read().decode(), _subtype=sub_type)
             fp.close()
         elif main_type == 'image':
-            fp = open(filename, 'rb')
+            #fp = open(filename, 'rb',encoding="utf-8")
+            print("Gmail______1"+str(filename))
+            fp = open(filename, "rb")
             msg = MIMEImage(fp.read(), _subtype=sub_type)
             fp.close()
         elif main_type == 'audio':
@@ -57,6 +61,7 @@ class Mailing(QThread):
             msg.set_payload(fp.read())
             fp.close()
         filename = os.path.basename(filename)
+        print("Gmail______2"+str(filename))
         msg.add_header('Content-Disposition', 'attachment', filename=filename)
         message.attach(msg)
         
@@ -81,8 +86,9 @@ class Mailing(QThread):
         return service.users().messages().send(userId="me",body=self.build_message(destination, obj, body, attachments)).execute()
     
     def run(self):
+        self.send_message(self.service, self.destination, self.obj, self.body, self.attachments)
         try:
-            self.send_message(self.service, self.destination, self.obj, self.body, self.attachments)
+            #self.send_message(self.service, self.destination, self.obj, self.body, self.attachments)
             print("mail sent")
             self.SendingResult_Progress.emit(1)
         except:

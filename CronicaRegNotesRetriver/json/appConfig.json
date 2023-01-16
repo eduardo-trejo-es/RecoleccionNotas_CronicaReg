@@ -1,1 +1,1 @@
-{"MailFrom": "notas.automaticas@gmail.com", "CredentialPath": "/Users/eduardo/Desktop/RecoleccionNotas_CronicaReg/CronicaRegNotesRetriver/GoogleAPI_Credentials/credentials.json", "MailTo": "paginalalo9@gmail.com", "Veryfication": 1}
+{"MailFrom": "notas.automaticas@gmail.com", "CredentialPath": "GoogleAPI_Credentials/credentials.json", "MailTo": "paginalalo9@gmail.com", "Veryfication": 1}
